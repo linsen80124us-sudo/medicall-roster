@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical - Roster System</title>
+    <style>
+        /* PASTE YOUR ENTIRE CSS HERE (from your original file) */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #3b82f6;
+            --secondary: #059669;
+            --danger: #dc2626;
+            --warning: #d97706;
+            --purple: #7c3aed;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+        /* ... (paste all your CSS styles here) ... */
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text);
+        }
+        /* Continue with ALL your CSS... */
+    </style>
+</head>
+<body>
+    <!-- PASTE YOUR ENTIRE HTML BODY HERE (from your original file) -->
+    
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <!-- ... all your login HTML ... -->
+    </div>
+
+    <!-- Password Change Modal -->
+    <div class="modal" id="passwordChangeModal">
+        <!-- ... -->
+    </div>
+
+    <!-- Quick Request Modal -->
+    <div class="modal" id="quickRequestModal">
+        <!-- ... -->
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- ... all your app HTML ... -->
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <!-- ... -->
+    </div>
+
+    <!-- Day Detail Modal -->
+    <div class="modal" id="dayModal">
+        <!-- ... -->
+    </div>
+
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue, push, update, remove, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+
+        // PASTE YOUR FIREBASE CONFIG HERE
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+
+        // Data Storage Variables
+        let currentUser = null;
+        let currentUserData = null;
+        let isAdmin = false;
+        const ADMIN_EMAIL = 'linsen@medical.com';
+        let officers = [];
+        let roster = {};
+        let requests = [];
+        let absences = [];
+        let locked = false;
+        let lockDate = null;
+        let currentCalendarDate = new Date();
+        let quickRequestDate = null;
+
+        // Singapore Holidays (keep your existing arrays)
+        const SINGAPORE_HOLIDAYS_2026 = [
+            '2026-01-01', '2026-02-17', '2026-02-18', '2026-04-03', '2026-05-01',
+            '2026-05-11', '2026-05-31', '2026-07-20', '2026-08-09', '2026-11-09', '2026-12-25'
+        ];
+        // ... (keep all your holiday arrays) ...
+
+        const HOLIDAY_NAMES = {
+            '2026-01-01': 'New Year\'s Day', /* ... */
+        };
+
+        const ALL_SINGAPORE_HOLIDAYS = [...SINGAPORE_HOLIDAYS_2026 /* ... */];
+
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAutoLock();
+            
+            // Listen for auth state changes
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    currentUser = user;
+                    loadUserData(user.uid);
+                } else {
+                    showLoginScreen();
+                }
+            });
+        });
+
+        // Load user data from Firebase
+        async function loadUserData(uid) {
+            const userRef = ref(db, `users/${uid}`);
+            const snapshot = await get(userRef);
+            
+            if (snapshot.exists()) {
+                currentUserData = snapshot.val();
+                isAdmin = currentUserData.role === 'admin';
+                enterApp();
+            } else {
+                // First time user - create profile
+                const isFirstUser = (await get(ref(db, 'users'))).val() === null;
+                currentUserData = {
+                    name: currentUser.email.split('@')[0],
+                    role: isFirstUser ? 'admin' : 'user',
+                    createdAt: new Date().toISOString(),
+                    isActive: true
+                };
+                await set(userRef, currentUserData);
+                isAdmin = currentUserData.role === 'admin';
+                enterApp();
+            }
+            
+            // Start listening to shared data
+            listenToSharedData();
+        }
+
+        // Listen to real-time data changes
+        function listenToSharedData() {
+            const dataRef = ref(db, 'sharedData');
+            onValue(dataRef, (snapshot) => {
+                const data = snapshot.val() || {};
+                roster = data.roster || {};
+                requests = data.requests || [];
+                absences = data.absences || [];
+                locked = data.locked || false;
+                lockDate = data.lockDate || null;
+                
+                // Update officers list from users
+                updateOfficersList();
+                
+                // Re-render if app is open
+                if (document.getElementById('appContainer').style.display === 'block') {
+                    renderCalendar();
+                    renderMyRequests();
+                    renderMyAbsences();
+                    renderStats();
+                    if (isAdmin) {
+                        renderAdminPanel();
+                        renderUsersTable();
+                        renderOfficersTab();
+                    }
+                }
+            });
+        }
+
+        // Update officers list from Firebase users
+        async function updateOfficersList() {
+            const usersRef = ref(db, 'users');
+            const snapshot = await get(usersRef);
+            const users = snapshot.val() || {};
+            
+            officers = Object.entries(users)
+                .filter(([uid, data]) => data.role === 'user' && data.isActive !== false)
+                .map(([uid, data]) => data.name || uid);
+        }
+
+        // Save data to Firebase (replaces localStorage)
+        async function saveData() {
+            const data = {
+                roster,
+                requests,
+                absences,
+                locked,
+                lockDate,
+                lastSaved: new Date().toISOString()
+            };
+            
+            try {
+                await set(ref(db, 'sharedData'), data);
+                updateSyncStatus('synced');
+            } catch (error) {
+                console.error('Save failed:', error);
+                updateSyncStatus('error');
+            }
+        }
+
+        // Authentication Functions
+        async function login() {
+            const email = document.getElementById('username').value.trim() + '@medical.com';
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                showAlert('loginError', 'Please enter both username and password');
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                // Auth state listener will handle the rest
+            } catch (error) {
+                showAlert('loginError', getErrorMessage(error.code));
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            if (!username) {
+                showAlert('loginError', 'Please enter your full name');
+                return;
+            }
+            if (password.length < 6) {
+                showAlert('loginError', 'Password must be at least 6 characters');
+                return;
+            }
+            if (password !== confirmPassword) {
+                showAlert('loginError', 'Passwords do not match');
+                return;
+            }
+
+            const email = username.toLowerCase().replace(/\s+/g, '.') + '@medical.com';
+
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                // User data will be created in loadUserData
+                showAlert('loginSuccess', 'Account created! Please sign in.');
+                setTimeout(showLogin, 1500);
+            } catch (error) {
+                showAlert('loginError', getErrorMessage(error.code));
+            }
+        }
+
+        function getErrorMessage(code) {
+            const messages = {
+                'auth/user-not-found': 'User not found. Please register.',
+                'auth/wrong-password': 'Invalid password',
+                'auth/email-already-in-use': 'An account with this name exists',
+                'auth/weak-password': 'Password should be at least 6 characters',
+                'auth/invalid-email': 'Invalid username format'
+            };
+            return messages[code] || 'Login failed. Please try again.';
+        }
+
+        async function logout() {
+            await signOut(auth);
+            location.reload();
+        }
+
+        // Password Change
+        async function changePassword() {
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (newPassword.length < 6) {
+                showAlert('passwordChangeError', 'Password must be at least 6 characters');
+                return;
+            }
+            if (newPassword !== confirmPassword) {
+                showAlert('passwordChangeError', 'Passwords do not match');
+                return;
+            }
+
+            try {
+                await updatePassword(currentUser, newPassword);
+                showAlert('passwordChangeSuccess', 'Password updated successfully!');
+                setTimeout(() => {
+                    document.getElementById('passwordChangeModal').classList.remove('active');
+                }, 1500);
+            } catch (error) {
+                showAlert('passwordChangeError', 'Failed to update password. Please re-login and try again.');
+            }
+        }
+
+        // App Entry
+        function enterApp() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            document.getElementById('currentUserDisplay').textContent = currentUserData.name || currentUser.email;
+
+            if (isAdmin) {
+                document.getElementById('adminBadge').style.display = 'inline';
+                document.getElementById('userBadge').style.display = 'none';
+                document.getElementById('adminNotice').style.display = 'block';
+                document.getElementById('rosterExcludedNotice').style.display = 'block';
+                document.querySelectorAll('.admin-only').forEach(el => el.classList.add('visible'));
+                document.querySelectorAll('.admin-only-visible').forEach(el => el.classList.add('visible'));
+            }
+
+            currentCalendarDate = new Date();
+            renderCalendar();
+            renderMyRequests();
+            renderMyAbsences();
+            renderStats();
+            
+            if (isAdmin) {
+                renderAdminPanel();
+                renderUsersTable();
+                renderOfficersTab();
+                updateOfficerSelects();
+            }
+        }
+
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appContainer').style.display = 'none';
+        }
+
+        // UI Helper Functions (keep your existing ones)
+        function showAlert(id, message) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.textContent = message;
+                el.classList.add('show');
+                setTimeout(() => el.classList.remove('show'), 5000);
+            }
+        }
+
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('loginSubtitle').textContent = 'Create your account';
+            clearAlerts();
+        }
+
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginSubtitle').textContent = 'Sign in to access the duty roster system';
+            clearAlerts();
+        }
+
+        function clearAlerts() {
+            document.querySelectorAll('.alert').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+        }
+
+        // Password strength checker
+        function checkRegPasswordStrength() {
+            const password = document.getElementById('regPassword').value;
+            const bar = document.getElementById('regStrengthBar');
+            if (password.length < 6) bar.className = 'password-strength-bar';
+            else if (password.length < 8) bar.className = 'password-strength-bar strength-weak';
+            else if (password.length < 10 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) 
+                bar.className = 'password-strength-bar strength-medium';
+            else bar.className = 'password-strength-bar strength-strong';
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('newPassword').value;
+            const bar = document.getElementById('strengthBar');
+            const text = document.getElementById('strengthText');
+            
+            if (password.length < 6) {
+                bar.className = 'password-strength-bar';
+                text.textContent = 'Enter at least 6 characters';
+                text.style.color = '#64748b';
+            } else if (password.length < 8) {
+                bar.className = 'password-strength-bar strength-weak';
+                text.textContent = 'Weak - Add more characters';
+                text.style.color = '#dc2626';
+            } else if (password.length < 10 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+                bar.className = 'password-strength-bar strength-medium';
+                text.textContent = 'Medium - Add uppercase and numbers';
+                text.style.color = '#d97706';
+            } else {
+                bar.className = 'password-strength-bar strength-strong';
+                text.textContent = 'Strong password';
+                text.style.color = '#059669';
+            }
+        }
+
+        // Navigation
+        function showTab(tab) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.add('active');
+            
+            if (tab === 'calendar') renderCalendar();
+            if (tab === 'requests') renderMyRequests();
+            if (tab === 'absence') renderMyAbsences();
+            if (tab === 'stats') renderStats();
+            if (tab === 'users') renderUsersTable();
+            if (tab === 'admin') renderAdminPanel();
+            if (tab === 'officers') { renderOfficersTab(); updateOfficerSelects(); }
+        }
+
+        // Calendar Functions
+        function changeMonth(direction) {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + direction);
+            renderCalendar();
+        }
+
+        function jumpToMonth() {
+            const input = document.getElementById('jumpToMonth');
+            if (input.value) {
+                const [year, month] = input.value.split('-').map(Number);
+                currentCalendarDate = new Date(year, month - 1, 1);
+                renderCalendar();
+            }
+        }
+
+        function goToToday() {
+            currentCalendarDate = new Date();
+            document.getElementById('jumpToMonth').value = '';
+            renderCalendar();
+        }
+
+        // Quick Request Modal
+        function openQuickRequest(dateStr, type) {
+            if (locked && !isAdmin) {
+                alert('Requests are currently locked. Contact administrator.');
+                return;
+            }
+            const date = new Date(dateStr);
+            if (date < new Date().setHours(0,0,0,0)) {
+                alert('Cannot make requests for past dates');
+                return;
+            }
+            quickRequestDate = dateStr;
+            document.getElementById('selectedDateDisplay').textContent = new Date(dateStr).toDateString();
+            document.getElementById('quickRequestType').value = type;
+            document.getElementById('quickRequestNotes').value = '';
+            
+            if (isAdmin) updateQuickRequestOfficerSelect();
+            document.getElementById('quickRequestModal').classList.add('active');
+        }
+
+        function updateQuickRequestOfficerSelect() {
+            const select = document.getElementById('quickRequestOfficer');
+            select.innerHTML = '<option value="">-- Select Officer (Default: You) --</option>';
+            officers.forEach(officer => {
+                const option = document.createElement('option');
+                option.value = officer;
+                option.textContent = officer;
+                select.appendChild(option);
+            });
+        }
+
+        function closeQuickRequestModal() {
+            document.getElementById('quickRequestModal').classList.remove('active');
+            quickRequestDate = null;
+        }
+
+        async function submitQuickRequest() {
+            const type = document.getElementById('quickRequestType').value;
+            const notes = document.getElementById('quickRequestNotes').value.trim();
+            let targetUser = currentUserData.name || currentUser.email.split('@')[0];
+            
+            if (isAdmin) {
+                const selectedOfficer = document.getElementById('quickRequestOfficer').value;
+                if (selectedOfficer) targetUser = selectedOfficer;
+            }
+
+            if (!quickRequestDate) return;
+
+            const exists = requests.find(r => r.user === targetUser && r.date === quickRequestDate && r.type === type);
+            if (exists) {
+                showAlert('quickRequestError', 'This officer already has this request for this date');
+                return;
+            }
+
+            const request = {
+                id: Date.now(),
+                user: targetUser,
+                type: type,
+                date: quickRequestDate,
+                status: 'pending',
+                notes: notes,
+                createdBy: currentUserData.name || currentUser.email,
+                createdAt: new Date().toISOString()
+            };
+
+            requests.push(request);
+            await saveData();
+            
+            showAlert('quickRequestSuccess', 'Request submitted successfully!');
+            setTimeout(() => {
+                closeQuickRequestModal();
+                renderCalendar();
+            }, 1000);
+        }
+
+        // Helper functions
+        function getActiveOfficers() {
+            const today = new Date().toISOString().split('T')[0];
+            const absentOfficers = absences
+                .filter(a => a.status === 'approved' && a.startDate <= today && (!a.endDate || a.endDate >= today))
+                .map(a => a.user);
+            return officers.filter(o => !absentOfficers.includes(o));
+        }
+
+        function isOfficerAbsent(officer, dateStr) {
+            return absences.some(a => 
+                a.user === officer && 
+                a.status === 'approved' && 
+                a.startDate <= dateStr && 
+                (!a.endDate || a.endDate >= dateStr)
+            );
+        }
+
+        function checkHoliday(date) {
+            return ALL_SINGAPORE_HOLIDAYS.includes(date.toISOString().split('T')[0]);
+        }
+
+        function getHolidayName(date) {
+            return HOLIDAY_NAMES[date.toISOString().split('T')[0]] || null;
+        }
+
+        function checkAutoLock() {
+            const today = new Date();
+            if (today.getDate() >= 25) {
+                locked = true;
+                lockDate = new Date(today.getFullYear(), today.getMonth(), 25).toISOString();
+            }
+            if (locked) document.getElementById('lockAlert').classList.add('show');
+        }
+
+        function updateSyncStatus(status) {
+            const indicator = document.getElementById('syncIndicator');
+            const text = document.getElementById('syncText');
+            indicator.className = 'sync-indicator';
+            
+            if (status === 'synced') {
+                indicator.classList.add('sync-synced');
+                text.textContent = 'Synced';
+            } else if (status === 'pending') {
+                indicator.classList.add('sync-pending');
+                text.textContent = 'Syncing...';
+            } else if (status === 'error') {
+                indicator.classList.add('sync-error');
+                text.textContent = 'Sync Error';
+            }
+        }
+
+        // Render Functions (simplified versions - expand with your full logic)
+        function renderCalendar() {
+            const grid = document.getElementById('calendarGrid');
+            if (!grid) return;
+            
+            grid.innerHTML = '';
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                              'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            document.getElementById('calendarMonthYear').textContent = 
+                `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
+            
+            // Calendar rendering logic (paste your existing renderCalendar code here)
+            // Make sure to use the Firebase data (roster, requests, absences)
+        }
+
+        function renderMyRequests() {
+            const list = document.getElementById('myRequestsList');
+            if (!list) return;
+            
+            const userName = currentUserData.name || currentUser.email.split('@')[0];
+            const myReqs = requests
+                .filter(r => r.user === userName)
+                .sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Render logic (paste your existing code)
+        }
+
+        function renderMyAbsences() {
+            const list = document.getElementById('myAbsenceList');
+            if (!list) return;
+            
+            const userName = currentUserData.name || currentUser.email.split('@')[0];
+            const myAbsences = absences
+                .filter(a => a.user === userName)
+                .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            
+            // Render logic
+        }
+
+        function renderStats() {
+            // Your stats calculation using Firebase data
+        }
+
+        function renderAdminPanel() {
+            if (!isAdmin) return;
+            // Your admin panel rendering
+        }
+
+        function renderUsersTable() {
+            if (!isAdmin) return;
+            // Fetch users from Firebase and render
+        }
+
+        function renderOfficersTab() {
+            if (!isAdmin) return;
+            // Your officers tab rendering
+        }
+
+        function updateOfficerSelects() {
+            if (!isAdmin) return;
+            // Update select dropdowns
+        }
+
+        // Request submission functions
+        async function submitRequest() {
+            if (locked && !isAdmin) {
+                showAlert('requestError', 'Requests are currently locked');
+                return;
+            }
+            // Your existing submitRequest logic, but use await saveData() at the end
+        }
+
+        async function deleteRequest(id) {
+            if (locked && !isAdmin) {
+                showAlert('requestError', 'Requests are locked');
+                return;
+            }
+            if (!confirm('Are you sure you want to delete this request?')) return;
+            
+            requests = requests.filter(r => r.id !== id);
+            await saveData();
+            renderMyRequests();
+            renderCalendar();
+        }
+
+        // Absence functions
+        async function submitAbsence() {
+            // Your existing logic
+            // Use await saveData() at the end
+        }
+
+        async function deleteAbsence(id) {
+            if (!confirm('Are you sure you want to delete this absence record?')) return;
+            absences = absences.filter(a => a.id !== id);
+            await saveData();
+            renderMyAbsences();
+        }
+
+        // Admin functions
+        async function addNewUser() {
+            // Create user in Firebase Auth
+        }
+
+        async function toggleUserStatus(username) {
+            // Update user in Firebase
+        }
+
+        async function resetUserPassword(username) {
+            // Reset in Firebase Auth
+        }
+
+        async function addNewOfficer() {
+            // Add to Firebase users
+        }
+
+        async function removeOfficer() {
+            // Deactivate in Firebase
+        }
+
+        async function submitAdminRequest() {
+            // Create request and saveData()
+        }
+
+        async function submitAdminAbsence() {
+            // Create absence and saveData()
+        }
+
+        async function updateRequestStatus(id, status) {
+            const req = requests.find(r => r.id === id);
+            if (req) {
+                req.status = status;
+                await saveData();
+            }
+        }
+
+        async function updateAbsenceStatus(id, status) {
+            const abs = absences.find(a => a.id === id);
+            if (abs) {
+                abs.status = status;
+                await saveData();
+            }
+        }
+
+        async function toggleLock() {
+            locked = document.getElementById('lockRequests').checked;
+            lockDate = locked ? new Date().toISOString() : null;
+            await saveData();
+            
+            if (locked) document.getElementById('lockAlert').classList.add('show');
+            else document.getElementById('lockAlert').classList.remove('show');
+            
+            renderCalendar();
+        }
+
+        async function resetSystem() {
+            if (!confirm('⚠️ WARNING: This will delete ALL data. Continue?')) return;
+            if (!confirm('Please confirm again: This action cannot be undone. Continue?')) return;
+            
+            await set(ref(db, 'sharedData'), null);
+            location.reload();
+        }
+
+        // Roster generation
+        async function generateRoster() {
+            // Your existing algorithm
+            // Use await saveData() at the end instead of localStorage
+        }
+
+        // Settings functions
+        function showSettings() {
+            document.getElementById('settingsUsername').value = currentUserData.name || currentUser.email;
+            document.getElementById('settingsRole').value = isAdmin ? 'Administrator' : 'Medical Officer';
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettings() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function checkSettingsPasswordStrength() {
+            // Your existing code
+        }
+
+        async function changePasswordFromSettings() {
+            // Your existing code using Firebase updatePassword
+        }
+
+        // Modal functions
+        function openDayModal(dateStr) {
+            // Your existing code
+        }
+
+        function quickRequestFromModal(date, type) {
+            closeModal();
+            openQuickRequest(date, type);
+        }
+
+        function closeModal() {
+            document.getElementById('dayModal').classList.remove('active');
+        }
+
+        // Make functions available globally for HTML onclick handlers
+        window.login = login;
+        window.register = register;
+        window.logout = logout;
+        window.showRegister = showRegister;
+        window.showLogin = showLogin;
+        window.changePassword = changePassword;
+        window.checkPasswordStrength = checkPasswordStrength;
+        window.checkRegPasswordStrength = checkRegPasswordStrength;
+        window.showTab = showTab;
+        window.changeMonth = changeMonth;
+        window.jumpToMonth = jumpToMonth;
+        window.goToToday = goToToday;
+        window.openQuickRequest = openQuickRequest;
+        window.closeQuickRequestModal = closeQuickRequestModal;
+        window.submitQuickRequest = submitQuickRequest;
+        window.submitRequest = submitRequest;
+        window.deleteRequest = deleteRequest;
+        window.submitAbsence = submitAbsence;
+        window.deleteAbsence = deleteAbsence;
+        window.showSettings = showSettings;
+        window.closeSettings = closeSettings;
+        window.changePasswordFromSettings = changePasswordFromSettings;
+        window.checkSettingsPasswordStrength = checkSettingsPasswordStrength;
+        window.openDayModal = openDayModal;
+        window.closeModal = closeModal;
+        window.quickRequestFromModal = quickRequestFromModal;
+        window.addNewUser = addNewUser;
+        window.toggleUserStatus = toggleUserStatus;
+        window.resetUserPassword = resetUserPassword;
+        window.addNewOfficer = addNewOfficer;
+        window.removeOfficer = removeOfficer;
+        window.submitAdminRequest = submitAdminRequest;
+        window.submitAdminAbsence = submitAdminAbsence;
+        window.updateRequestStatus = updateRequestStatus;
+        window.updateAbsenceStatus = updateAbsenceStatus;
+        window.toggleLock = toggleLock;
+        window.resetSystem = resetSystem;
+        window.generateRoster = generateRoster;
+    </script>
+</body>
+</html>
