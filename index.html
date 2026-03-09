@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Medical - Roster System</title>
     <style>
-        /* PASTE YOUR ENTIRE CSS HERE (from your original file) */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
             --primary: #1e3a8a;
             --primary-light: #3b82f6;
@@ -19,66 +23,1176 @@
             --text: #1e293b;
             --border: #e2e8f0;
         }
-        /* ... (paste all your CSS styles here) ... */
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
             color: var(--text);
         }
-        /* Continue with ALL your CSS... */
+
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: var(--card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .login-card p {
+            color: #64748b;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            background: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(30, 58, 138, 0.2);
+        }
+
+        button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .app-container {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--card);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge-admin {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .badge-user {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 12px 24px;
+            background: var(--card);
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            color: #64748b;
+            transition: all 0.3s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .calendar-nav h2 {
+            margin: 0;
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .nav-btn {
+            width: auto;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .calendar-header {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary);
+            padding: 10px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .calendar-day {
+            background: #f8fafc;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            min-height: 140px;
+            padding: 10px;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .calendar-day:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .calendar-day.weekend {
+            background: #fef3c7;
+        }
+
+        .calendar-day.holiday {
+            background: #fee2e2;
+            border-color: var(--danger);
+        }
+
+        .calendar-day.past {
+            opacity: 0.6;
+            background: #f1f5f9;
+        }
+
+        .day-number {
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .day-actions {
+            display: flex;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .calendar-day:hover .day-actions {
+            opacity: 1;
+        }
+
+        .day-action-btn {
+            width: 24px;
+            height: 24px;
+            padding: 0;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .day-action-btn.request {
+            background: var(--secondary);
+        }
+
+        .day-action-btn.block {
+            background: var(--danger);
+        }
+
+        .day-action-btn.leave {
+            background: var(--purple);
+        }
+
+        .duty-assignment {
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .duty-oncall {
+            background: #dbeafe;
+            color: var(--primary);
+        }
+
+        .duty-postcall {
+            background: #d1fae5;
+            color: var(--secondary);
+        }
+
+        .duty-ward {
+            background: #fef3c7;
+            color: var(--warning);
+        }
+
+        .day-requests {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .request-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .request-item {
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .request-item.call-block {
+            border-left-color: var(--danger);
+        }
+
+        .request-item.call-request {
+            border-left-color: var(--secondary);
+        }
+
+        .request-item.leave {
+            border-left-color: var(--purple);
+        }
+
+        .request-item.absence {
+            border-left-color: #6b7280;
+            background: #f3f4f6;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 13px;
+            width: auto;
+            border-radius: 6px;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+        }
+
+        .btn-purple {
+            background: var(--purple);
+        }
+
+        .btn-secondary {
+            background: #64748b;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .admin-only {
+            display: none;
+        }
+
+        .admin-only.visible {
+            display: block;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: var(--danger);
+            border: 2px solid var(--danger);
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            color: var(--warning);
+            border: 2px solid var(--warning);
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .member-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .member-tag {
+            background: #e0e7ff;
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .member-tag.inactive {
+            background: #fee2e2;
+            color: var(--danger);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-day {
+                min-height: auto;
+            }
+            
+            .day-actions {
+                opacity: 1;
+            }
+            
+            .calendar-nav h2 {
+                font-size: 18px;
+                min-width: auto;
+            }
+        }
+
+        .sync-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--card);
+            padding: 10px 15px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 100;
+        }
+
+        .sync-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .sync-synced { background: var(--secondary); }
+        .sync-pending { background: var(--warning); animation: pulse 1.5s infinite; }
+        .sync-error { background: var(--danger); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .register-link a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .user-table th, .user-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .user-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .user-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btns button {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .roster-excluded {
+            background: #fef3c7;
+            border: 2px dashed var(--warning);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .password-strength {
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .password-strength-bar {
+            height: 100%;
+            width: 0;
+            transition: all 0.3s;
+        }
+
+        .strength-weak { background: var(--danger); width: 33%; }
+        .strength-medium { background: var(--warning); width: 66%; }
+        .strength-strong { background: var(--secondary); width: 100%; }
+
+        .settings-section {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: #d1fae5;
+            color: var(--secondary);
+        }
+
+        .status-inactive {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .info-box {
+            background: #eff6ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #1e40af;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .today-marker {
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .month-jump {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .month-jump input {
+            width: auto;
+        }
+
+        .selected-date-display {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .admin-action-section {
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .admin-action-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .holiday-label {
+            font-size: 10px;
+            color: var(--danger);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+
+        .admin-only-visible {
+            display: none;
+        }
+
+        .admin-only-visible.visible {
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
-    <!-- PASTE YOUR ENTIRE HTML BODY HERE (from your original file) -->
-    
+
     <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
-        <!-- ... all your login HTML ... -->
-    </div>
+        <div class="login-card">
+            <h1>🏥 Medical Roster</h1>
+            <p id="loginSubtitle">Sign in to access the duty roster system</p>
+            
+            <div class="alert alert-error" id="loginError"></div>
+            <div class="alert alert-success" id="loginSuccess"></div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="Enter your username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                
+                <button onclick="login()" id="loginBtn">Sign In</button>
+                
+                <div class="register-link">
+                    <p>New medical officer? <a href="#" onclick="showRegister()">Register here</a></p>
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center; font-size: 12px; color: #64748b;">
+                    <p>Default Admin: linsen / admin123</p>
+                </div>
+            </div>
 
-    <!-- Password Change Modal -->
-    <div class="modal" id="passwordChangeModal">
-        <!-- ... -->
+            <div id="registerForm" style="display:none;">
+                <div class="form-group">
+                    <label for="regUsername">Full Name</label>
+                    <input type="text" id="regUsername" placeholder="Enter your full name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" placeholder="Create password (min 6 characters)" oninput="checkRegPasswordStrength()">
+                    <div class="password-strength">
+                        <div class="password-strength-bar" id="regStrengthBar"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirm Password</label>
+                    <input type="password" id="regConfirmPassword" placeholder="Confirm password">
+                </div>
+                
+                <button onclick="register()" id="registerBtn">Create Account</button>
+                <button class="btn-secondary" onclick="showLogin()" style="margin-top: 10px;">Back to Login</button>
+            </div>
+        </div>
     </div>
 
     <!-- Quick Request Modal -->
     <div class="modal" id="quickRequestModal">
-        <!-- ... -->
+        <div class="modal-content">
+            <h2>📝 Quick Request</h2>
+            <div class="alert alert-error" id="quickRequestError"></div>
+            <div class="alert alert-success" id="quickRequestSuccess"></div>
+            
+            <div class="selected-date-display" id="selectedDateDisplay"></div>
+            
+            <div class="form-group admin-only-visible" id="adminOfficerSelect">
+                <label>Select Officer</label>
+                <select id="quickRequestOfficer">
+                    <option value="">-- Select Officer (Default: You) --</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Request Type</label>
+                <select id="quickRequestType">
+                    <option value="call-request">✓ Call Request (Want duty)</option>
+                    <option value="call-block">🚫 Call Block (Not on duty)</option>
+                    <option value="leave">🌴 Leave Request</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Notes (Optional)</label>
+                <textarea id="quickRequestNotes" rows="2" placeholder="Any additional information..."></textarea>
+            </div>
+            
+            <button onclick="submitQuickRequest()" id="quickRequestBtn">Submit Request</button>
+            <button class="btn-secondary" onclick="closeQuickRequestModal()" style="margin-top: 10px;">Cancel</button>
+        </div>
     </div>
 
     <!-- Main App -->
     <div class="app-container" id="appContainer">
-        <!-- ... all your app HTML ... -->
-    </div>
+        <div class="sync-status" id="syncStatus">
+            <div class="sync-indicator sync-synced" id="syncIndicator"></div>
+            <span id="syncText">Synced</span>
+        </div>
 
-    <!-- Settings Modal -->
-    <div class="modal" id="settingsModal">
-        <!-- ... -->
+        <header>
+            <div class="user-info">
+                <h2>🏥 Medical Roster</h2>
+                <span class="badge badge-admin" id="adminBadge" style="display:none">Administrator</span>
+                <span class="badge badge-user" id="userBadge">Medical Officer</span>
+            </div>
+            <div>
+                <span id="currentUserDisplay" style="margin-right: 15px; font-weight: 600;"></span>
+                <button class="btn-small btn-secondary" onclick="logout()" style="width: auto;">Logout</button>
+            </div>
+        </header>
+
+        <div class="alert alert-warning" id="lockAlert">
+            Requests are locked for next month. Contact administrator to unlock.
+        </div>
+
+        <div class="alert alert-info" id="adminNotice" style="display:none;">
+            As administrator, you are excluded from automatic roster planning.
+        </div>
+
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('calendar')">📅 Roster Calendar</button>
+            <button class="nav-tab" onclick="showTab('requests')">📝 My Requests</button>
+            <button class="nav-tab" onclick="showTab('absence')">📤 Absence</button>
+            <button class="nav-tab" onclick="showTab('stats')">📊 Statistics</button>
+            <button class="nav-tab admin-only" onclick="showTab('admin')">🔧 Admin Panel</button>
+        </nav>
+
+        <!-- Calendar Tab -->
+        <div class="content-section active" id="calendarTab">
+            <div class="card">
+                <div class="calendar-nav">
+                    <button class="nav-btn btn-secondary" onclick="changeMonth(-1)">← Previous</button>
+                    <h2 id="calendarMonthYear">Month Year</h2>
+                    <button class="nav-btn btn-secondary" onclick="changeMonth(1)">Next →</button>
+                </div>
+                
+                <div class="month-jump">
+                    <label style="margin: 0;">Jump to:</label>
+                    <input type="month" id="jumpToMonth" onchange="jumpToMonth()">
+                    <button class="btn-small" onclick="goToToday()" style="width: auto;">Today</button>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #dbeafe;"></div>
+                        <span>On Call</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #d1fae5;"></div>
+                        <span>Post Call</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #fef3c7;"></div>
+                        <span>Ward Round</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #fee2e2; border: 2px solid #dc2626;"></div>
+                        <span>Public Holiday</span>
+                    </div>
+                </div>
+                
+                <div class="calendar-grid" id="calendarGrid"></div>
+            </div>
+        </div>
+
+        <!-- Requests Tab -->
+        <div class="content-section" id="requestsTab">
+            <div class="card">
+                <h2>Submit New Request</h2>
+                <div class="alert alert-error" id="requestError"></div>
+                <div class="alert alert-success" id="requestSuccess"></div>
+                
+                <div class="form-group">
+                    <label>Request Type</label>
+                    <select id="requestType">
+                        <option value="call-block">Call Block (Not on duty)</option>
+                        <option value="call-request">Call Request (Want duty)</option>
+                        <option value="leave">Leave Request</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="requestDate">
+                </div>
+                
+                <button onclick="submitRequest()">Submit Request</button>
+            </div>
+
+            <div class="card">
+                <h2>My Requests</h2>
+                <div id="myRequestsList" class="request-list"></div>
+            </div>
+        </div>
+
+        <!-- Absence Tab -->
+        <div class="content-section" id="absenceTab">
+            <div class="card">
+                <h2>📤 Submit Absence Notification</h2>
+                <div class="info-box">
+                    Use this form to notify about extended absence due to end of posting, transfer to another institution, or other long-term leave.
+                </div>
+                
+                <div class="alert alert-error" id="absenceError"></div>
+                <div class="alert alert-success" id="absenceSuccess"></div>
+                
+                <div class="form-group">
+                    <label>Absence Type</label>
+                    <select id="absenceType" class="absence-type-select">
+                        <option value="end-posting">End of Posting</option>
+                        <option value="transfer">Transfer to Another Institution</option>
+                        <option value="long-leave">Long-term Leave</option>
+                        <option value="resignation">Resignation</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Start Date (First day of absence)</label>
+                    <input type="date" id="absenceStartDate">
+                </div>
+                
+                <div class="form-group">
+                    <label>End Date (Expected return date, if known)</label>
+                    <input type="date" id="absenceEndDate">
+                    <small style="color: #64748b; display: block; margin-top: 5px;">Leave empty if indefinite or permanent</small>
+                </div>
+                
+                <div class="form-group absence-reason">
+                    <label>Additional Details / Reason</label>
+                    <textarea id="absenceReason" rows="3" placeholder="e.g., Transferring to General Hospital, End of 6-month posting, etc."></textarea>
+                </div>
+                
+                <button class="btn-warning" onclick="submitAbsence()">Submit Absence Notification</button>
+            </div>
+
+            <div class="card">
+                <h2>My Absence History</h2>
+                <div id="myAbsenceList" class="request-list"></div>
+            </div>
+        </div>
+
+        <!-- Statistics Tab -->
+        <div class="content-section" id="statsTab">
+            <div class="card">
+                <h2>Duty Statistics Overview</h2>
+                <div class="roster-excluded" id="rosterExcludedNotice" style="display:none;">
+                    👤 Administrator is excluded from roster planning
+                </div>
+                <div class="stats-grid" id="statsGrid"></div>
+            </div>
+            
+            <div class="card">
+                <h2>Detailed Breakdown</h2>
+                <div id="detailedStats"></div>
+            </div>
+        </div>
+
+        <!-- Admin Tab -->
+        <div class="content-section" id="adminTab">
+            <div class="card">
+                <h2>Generate Roster</h2>
+                <div class="roster-excluded">
+                    👤 Administrator is excluded from automatic roster planning
+                </div>
+                <div class="alert alert-error" id="generateError"></div>
+                <div class="alert alert-success" id="generateSuccess"></div>
+                
+                <div class="form-group">
+                    <label>Select Month</label>
+                    <input type="month" id="generateMonth">
+                </div>
+                
+                <button onclick="generateRoster()">Generate Optimized Roster</button>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-radius: 10px; font-size: 14px;">
+                    <strong>Algorithm considers:</strong>
+                    <ul style="margin-left: 20px; margin-top: 10px; line-height: 1.8;">
+                        <li>24-hour shifts (8am-8am)</li>
+                        <li>No consecutive days if possible</li>
+                        <li>Leave requests and blocks</li>
+                        <li>Absence notifications (end of posting, transfers)</li>
+                        <li>Weekend double coverage (Post-call + On-call)</li>
+                        <li>Holiday double coverage</li>
+                        <li>Balanced distribution (Admin excluded)</li>
+                        <li>Avoid duty on return from leave</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Manage Medical Officers</h2>
+                <div>
+                    <label>Current Active Officers:</label>
+                    <div class="member-list" id="officerList"></div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label>Currently Absent/Inactive:</label>
+                    <div class="member-list" id="inactiveOfficerList"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Absence Management (Admin)</h2>
+                <div id="allAbsencesList" class="request-list"></div>
+            </div>
+
+            <div class="card">
+                <h2>System Controls</h2>
+                <div class="form-group">
+                    <label>Request Lock Status</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="lockRequests" onchange="toggleLock()">
+                        <label for="lockRequests" style="margin: 0;">Lock all requests (only admin can edit)</label>
+                    </div>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 5px;">
+                        Auto-locks on 25th of each month
+                    </p>
+                </div>
+                
+                <button class="btn-danger" onclick="resetSystem()">⚠️ Reset All Data</button>
+                <p style="font-size: 13px; color: var(--danger); margin-top: 10px;">
+                    This will clear all rosters, requests, absences. Cannot be undone.
+                </p>
+            </div>
+
+            <div class="card">
+                <h2>All Requests (Admin View)</h2>
+                <div id="allRequestsList" class="request-list"></div>
+            </div>
+        </div>
     </div>
 
     <!-- Day Detail Modal -->
     <div class="modal" id="dayModal">
-        <!-- ... -->
+        <div class="modal-content">
+            <h2 id="modalDate">Date Details</h2>
+            <div id="modalContent"></div>
+            <button onclick="closeModal()" style="margin-top: 20px;">Close</button>
+        </div>
     </div>
 
-    <!-- FIREBASE SDK -->
     <script type="module">
-        // Import Firebase
+        // Firebase Configuration - YOUR ACTUAL CONFIG
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, push, update, remove, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updatePassword } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
+        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
 
-        // PASTE YOUR FIREBASE CONFIG HERE
         const firebaseConfig = {
-  apiKey: "AIzaSyA7vpSqN3zhD12PZ9e73TZ3HCgd6HPI6sY",
-  authDomain: "medicall-5c19e.firebaseapp.com",
-  databaseURL: "https://medicall-5c19e-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "medicall-5c19e",
-  storageBucket: "medicall-5c19e.firebasestorage.app",
-  messagingSenderId: "483611241612",
-  appId: "1:483611241612:web:72c40441585b42dd1e9fa9"
-
+            apiKey: "AIzaSyA7vpSqN3zhD12PZ9e73TZ3HCgd6HPI6sY",
+            authDomain: "medicall-5c19e.firebaseapp.com",
+            databaseURL: "https://medicall-5c19e-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "medicall-5c19e",
+            storageBucket: "medicall-5c19e.firebasestorage.app",
+            messagingSenderId: "483611241612",
+            appId: "1:483611241612:web:72c40441585b42dd1e9fa9"
         };
 
         // Initialize Firebase
@@ -86,11 +1200,10 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
 
-        // Data Storage Variables
+        // Global Variables
         let currentUser = null;
         let currentUserData = null;
         let isAdmin = false;
-        const ADMIN_EMAIL = 'linsen@medical.com';
         let officers = [];
         let roster = {};
         let requests = [];
@@ -100,18 +1213,59 @@
         let currentCalendarDate = new Date();
         let quickRequestDate = null;
 
-        // Singapore Holidays (keep your existing arrays)
+        // Singapore Holidays 2026-2030
         const SINGAPORE_HOLIDAYS_2026 = [
             '2026-01-01', '2026-02-17', '2026-02-18', '2026-04-03', '2026-05-01',
             '2026-05-11', '2026-05-31', '2026-07-20', '2026-08-09', '2026-11-09', '2026-12-25'
         ];
-        // ... (keep all your holiday arrays) ...
+
+        const SINGAPORE_HOLIDAYS_2027 = [
+            '2027-01-01', '2027-02-06', '2027-02-07', '2027-03-26', '2027-04-30',
+            '2027-05-01', '2027-05-20', '2027-07-09', '2027-08-09', '2027-10-29', '2027-12-25'
+        ];
+
+        const SINGAPORE_HOLIDAYS_2028 = [
+            '2028-01-01', '2028-01-26', '2028-01-27', '2028-04-14', '2028-04-19',
+            '2028-05-01', '2028-05-09', '2028-06-27', '2028-08-09', '2028-10-17', '2028-12-25'
+        ];
+
+        const SINGAPORE_HOLIDAYS_2029 = [
+            '2029-01-01', '2029-02-13', '2029-02-14', '2029-03-30', '2029-04-09',
+            '2029-04-28', '2029-05-01', '2029-06-16', '2029-08-09', '2029-11-05', '2029-12-25'
+        ];
+
+        const SINGAPORE_HOLIDAYS_2030 = [
+            '2030-01-01', '2030-02-03', '2030-02-04', '2030-03-30', '2030-04-19',
+            '2030-05-01', '2030-05-18', '2030-06-06', '2030-08-09', '2030-10-26', '2030-12-25'
+        ];
 
         const HOLIDAY_NAMES = {
-            '2026-01-01': 'New Year\'s Day', /* ... */
+            '2026-01-01': 'New Year\'s Day', '2026-02-17': 'Chinese New Year', '2026-02-18': 'Chinese New Year',
+            '2026-04-03': 'Good Friday', '2026-05-01': 'Labour Day', '2026-05-11': 'Hari Raya Puasa',
+            '2026-05-31': 'Vesak Day', '2026-07-20': 'Hari Raya Haji', '2026-08-09': 'National Day',
+            '2026-11-09': 'Deepavali', '2026-12-25': 'Christmas Day',
+            '2027-01-01': 'New Year\'s Day', '2027-02-06': 'Chinese New Year', '2027-02-07': 'Chinese New Year',
+            '2027-03-26': 'Good Friday', '2027-04-30': 'Hari Raya Puasa', '2027-05-01': 'Labour Day',
+            '2027-05-20': 'Vesak Day', '2027-07-09': 'Hari Raya Haji', '2027-08-09': 'National Day',
+            '2027-10-29': 'Deepavali', '2027-12-25': 'Christmas Day',
+            '2028-01-01': 'New Year\'s Day', '2028-01-26': 'Chinese New Year', '2028-01-27': 'Chinese New Year',
+            '2028-04-14': 'Good Friday', '2028-04-19': 'Hari Raya Puasa', '2028-05-01': 'Labour Day',
+            '2028-05-09': 'Vesak Day', '2028-06-27': 'Hari Raya Haji', '2028-08-09': 'National Day',
+            '2028-10-17': 'Deepavali', '2028-12-25': 'Christmas Day',
+            '2029-01-01': 'New Year\'s Day', '2029-02-13': 'Chinese New Year', '2029-02-14': 'Chinese New Year',
+            '2029-03-30': 'Good Friday', '2029-04-09': 'Hari Raya Puasa', '2029-04-28': 'Vesak Day',
+            '2029-05-01': 'Labour Day', '2029-06-16': 'Hari Raya Haji', '2029-08-09': 'National Day',
+            '2029-11-05': 'Deepavali', '2029-12-25': 'Christmas Day',
+            '2030-01-01': 'New Year\'s Day', '2030-02-03': 'Chinese New Year', '2030-02-04': 'Chinese New Year',
+            '2030-03-30': 'Hari Raya Puasa', '2030-04-19': 'Good Friday', '2030-05-01': 'Labour Day',
+            '2030-05-18': 'Vesak Day', '2030-06-06': 'Hari Raya Haji', '2030-08-09': 'National Day',
+            '2030-10-26': 'Deepavali', '2030-12-25': 'Christmas Day'
         };
 
-        const ALL_SINGAPORE_HOLIDAYS = [...SINGAPORE_HOLIDAYS_2026 /* ... */];
+        const ALL_SINGAPORE_HOLIDAYS = [
+            ...SINGAPORE_HOLIDAYS_2026, ...SINGAPORE_HOLIDAYS_2027, ...SINGAPORE_HOLIDAYS_2028,
+            ...SINGAPORE_HOLIDAYS_2029, ...SINGAPORE_HOLIDAYS_2030
+        ];
 
         // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
@@ -130,29 +1284,37 @@
 
         // Load user data from Firebase
         async function loadUserData(uid) {
-            const userRef = ref(db, `users/${uid}`);
-            const snapshot = await get(userRef);
-            
-            if (snapshot.exists()) {
-                currentUserData = snapshot.val();
-                isAdmin = currentUserData.role === 'admin';
+            try {
+                const userRef = ref(db, `users/${uid}`);
+                const snapshot = await get(userRef);
+                
+                if (snapshot.exists()) {
+                    currentUserData = snapshot.val();
+                    isAdmin = currentUserData.role === 'admin';
+                } else {
+                    // First time user - check if this is the first user ever
+                    const allUsersSnapshot = await get(ref(db, 'users'));
+                    const isFirstUser = !allUsersSnapshot.exists();
+                    
+                    currentUserData = {
+                        name: currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        role: isFirstUser ? 'admin' : 'user',
+                        createdAt: new Date().toISOString(),
+                        isActive: true
+                    };
+                    
+                    await set(userRef, currentUserData);
+                    isAdmin = currentUserData.role === 'admin';
+                }
+                
+                // Start listening to shared data
+                listenToSharedData();
                 enterApp();
-            } else {
-                // First time user - create profile
-                const isFirstUser = (await get(ref(db, 'users'))).val() === null;
-                currentUserData = {
-                    name: currentUser.email.split('@')[0],
-                    role: isFirstUser ? 'admin' : 'user',
-                    createdAt: new Date().toISOString(),
-                    isActive: true
-                };
-                await set(userRef, currentUserData);
-                isAdmin = currentUserData.role === 'admin';
-                enterApp();
+            } catch (error) {
+                console.error('Error loading user data:', error);
+                showAlert('loginError', 'Error loading user data. Please try again.');
             }
-            
-            // Start listening to shared data
-            listenToSharedData();
         }
 
         // Listen to real-time data changes
@@ -166,7 +1328,7 @@
                 locked = data.locked || false;
                 lockDate = data.lockDate || null;
                 
-                // Update officers list from users
+                // Update officers list
                 updateOfficersList();
                 
                 // Re-render if app is open
@@ -177,8 +1339,6 @@
                     renderStats();
                     if (isAdmin) {
                         renderAdminPanel();
-                        renderUsersTable();
-                        renderOfficersTab();
                     }
                 }
             });
@@ -192,11 +1352,13 @@
             
             officers = Object.entries(users)
                 .filter(([uid, data]) => data.role === 'user' && data.isActive !== false)
-                .map(([uid, data]) => data.name || uid);
+                .map(([uid, data]) => data.name || data.email.split('@')[0]);
         }
 
-        // Save data to Firebase (replaces localStorage)
+        // Save data to Firebase
         async function saveData() {
+            updateSyncStatus('pending');
+            
             const data = {
                 roster,
                 requests,
@@ -217,19 +1379,35 @@
 
         // Authentication Functions
         async function login() {
-            const email = document.getElementById('username').value.trim() + '@medical.com';
+            const username = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value;
-
-            if (!email || !password) {
+            const btn = document.getElementById('loginBtn');
+            
+            if (!username || !password) {
                 showAlert('loginError', 'Please enter both username and password');
                 return;
             }
-
+            
+            // Show loading
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Signing in...';
+            
+            const email = username.toLowerCase().replace(/\s+/g, '.') + '@medicall.com';
+            
             try {
                 await signInWithEmailAndPassword(auth, email, password);
                 // Auth state listener will handle the rest
             } catch (error) {
-                showAlert('loginError', getErrorMessage(error.code));
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
+                
+                let message = 'Login failed. Please try again.';
+                if (error.code === 'auth/user-not-found') message = 'User not found. Please register.';
+                else if (error.code === 'auth/wrong-password') message = 'Invalid password.';
+                else if (error.code === 'auth/invalid-email') message = 'Invalid username format.';
+                else if (error.code === 'auth/too-many-requests') message = 'Too many failed attempts. Please try again later.';
+                
+                showAlert('loginError', message);
             }
         }
 
@@ -237,7 +1415,8 @@
             const username = document.getElementById('regUsername').value.trim();
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
-
+            const btn = document.getElementById('registerBtn');
+            
             if (!username) {
                 showAlert('loginError', 'Please enter your full name');
                 return;
@@ -250,28 +1429,30 @@
                 showAlert('loginError', 'Passwords do not match');
                 return;
             }
-
-            const email = username.toLowerCase().replace(/\s+/g, '.') + '@medical.com';
-
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="loading"></span> Creating account...';
+            
+            const email = username.toLowerCase().replace(/\s+/g, '.') + '@medicall.com';
+            
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                // User data will be created in loadUserData
-                showAlert('loginSuccess', 'Account created! Please sign in.');
-                setTimeout(showLogin, 1500);
+                await createUserWithEmailAndPassword(auth, email, password);
+                showAlert('loginSuccess', 'Account created successfully! Please sign in.');
+                setTimeout(() => {
+                    showLogin();
+                    document.getElementById('username').value = username;
+                }, 1500);
             } catch (error) {
-                showAlert('loginError', getErrorMessage(error.code));
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+                
+                let message = 'Registration failed. Please try again.';
+                if (error.code === 'auth/email-already-in-use') message = 'An account with this name already exists.';
+                else if (error.code === 'auth/invalid-email') message = 'Invalid username format.';
+                else if (error.code === 'auth/weak-password') message = 'Password is too weak.';
+                
+                showAlert('loginError', message);
             }
-        }
-
-        function getErrorMessage(code) {
-            const messages = {
-                'auth/user-not-found': 'User not found. Please register.',
-                'auth/wrong-password': 'Invalid password',
-                'auth/email-already-in-use': 'An account with this name exists',
-                'auth/weak-password': 'Password should be at least 6 characters',
-                'auth/invalid-email': 'Invalid username format'
-            };
-            return messages[code] || 'Login failed. Please try again.';
         }
 
         async function logout() {
@@ -279,37 +1460,12 @@
             location.reload();
         }
 
-        // Password Change
-        async function changePassword() {
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (newPassword.length < 6) {
-                showAlert('passwordChangeError', 'Password must be at least 6 characters');
-                return;
-            }
-            if (newPassword !== confirmPassword) {
-                showAlert('passwordChangeError', 'Passwords do not match');
-                return;
-            }
-
-            try {
-                await updatePassword(currentUser, newPassword);
-                showAlert('passwordChangeSuccess', 'Password updated successfully!');
-                setTimeout(() => {
-                    document.getElementById('passwordChangeModal').classList.remove('active');
-                }, 1500);
-            } catch (error) {
-                showAlert('passwordChangeError', 'Failed to update password. Please re-login and try again.');
-            }
-        }
-
         // App Entry
         function enterApp() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
-            document.getElementById('currentUserDisplay').textContent = currentUserData.name || currentUser.email;
-
+            document.getElementById('currentUserDisplay').textContent = currentUserData.name || currentUserData.email.split('@')[0];
+            
             if (isAdmin) {
                 document.getElementById('adminBadge').style.display = 'inline';
                 document.getElementById('userBadge').style.display = 'none';
@@ -318,7 +1474,7 @@
                 document.querySelectorAll('.admin-only').forEach(el => el.classList.add('visible'));
                 document.querySelectorAll('.admin-only-visible').forEach(el => el.classList.add('visible'));
             }
-
+            
             currentCalendarDate = new Date();
             renderCalendar();
             renderMyRequests();
@@ -327,9 +1483,6 @@
             
             if (isAdmin) {
                 renderAdminPanel();
-                renderUsersTable();
-                renderOfficersTab();
-                updateOfficerSelects();
             }
         }
 
@@ -338,7 +1491,7 @@
             document.getElementById('appContainer').style.display = 'none';
         }
 
-        // UI Helper Functions (keep your existing ones)
+        // UI Helper Functions
         function showAlert(id, message) {
             const el = document.getElementById(id);
             if (el) {
@@ -359,6 +1512,13 @@
             document.getElementById('loginForm').style.display = 'block';
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginSubtitle').textContent = 'Sign in to access the duty roster system';
+            
+            // Reset buttons
+            document.getElementById('loginBtn').disabled = false;
+            document.getElementById('loginBtn').textContent = 'Sign In';
+            document.getElementById('registerBtn').disabled = false;
+            document.getElementById('registerBtn').textContent = 'Create Account';
+            
             clearAlerts();
         }
 
@@ -369,7 +1529,6 @@
             });
         }
 
-        // Password strength checker
         function checkRegPasswordStrength() {
             const password = document.getElementById('regPassword').value;
             const bar = document.getElementById('regStrengthBar');
@@ -380,28 +1539,30 @@
             else bar.className = 'password-strength-bar strength-strong';
         }
 
-        function checkPasswordStrength() {
-            const password = document.getElementById('newPassword').value;
-            const bar = document.getElementById('strengthBar');
-            const text = document.getElementById('strengthText');
+        function updateSyncStatus(status) {
+            const indicator = document.getElementById('syncIndicator');
+            const text = document.getElementById('syncText');
+            indicator.className = 'sync-indicator';
             
-            if (password.length < 6) {
-                bar.className = 'password-strength-bar';
-                text.textContent = 'Enter at least 6 characters';
-                text.style.color = '#64748b';
-            } else if (password.length < 8) {
-                bar.className = 'password-strength-bar strength-weak';
-                text.textContent = 'Weak - Add more characters';
-                text.style.color = '#dc2626';
-            } else if (password.length < 10 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-                bar.className = 'password-strength-bar strength-medium';
-                text.textContent = 'Medium - Add uppercase and numbers';
-                text.style.color = '#d97706';
-            } else {
-                bar.className = 'password-strength-bar strength-strong';
-                text.textContent = 'Strong password';
-                text.style.color = '#059669';
+            if (status === 'synced') {
+                indicator.classList.add('sync-synced');
+                text.textContent = 'Synced';
+            } else if (status === 'pending') {
+                indicator.classList.add('sync-pending');
+                text.textContent = 'Syncing...';
+            } else if (status === 'error') {
+                indicator.classList.add('sync-error');
+                text.textContent = 'Error';
             }
+        }
+
+        function checkAutoLock() {
+            const today = new Date();
+            if (today.getDate() >= 25) {
+                locked = true;
+                lockDate = new Date(today.getFullYear(), today.getMonth(), 25).toISOString();
+            }
+            if (locked) document.getElementById('lockAlert').classList.add('show');
         }
 
         // Navigation
@@ -415,9 +1576,7 @@
             if (tab === 'requests') renderMyRequests();
             if (tab === 'absence') renderMyAbsences();
             if (tab === 'stats') renderStats();
-            if (tab === 'users') renderUsersTable();
             if (tab === 'admin') renderAdminPanel();
-            if (tab === 'officers') { renderOfficersTab(); updateOfficerSelects(); }
         }
 
         // Calendar Functions
@@ -441,7 +1600,14 @@
             renderCalendar();
         }
 
-        // Quick Request Modal
+        function checkHoliday(date) {
+            return ALL_SINGAPORE_HOLIDAYS.includes(date.toISOString().split('T')[0]);
+        }
+
+        function getHolidayName(date) {
+            return HOLIDAY_NAMES[date.toISOString().split('T')[0]] || null;
+        }
+
         function openQuickRequest(dateStr, type) {
             if (locked && !isAdmin) {
                 alert('Requests are currently locked. Contact administrator.');
@@ -457,7 +1623,10 @@
             document.getElementById('quickRequestType').value = type;
             document.getElementById('quickRequestNotes').value = '';
             
-            if (isAdmin) updateQuickRequestOfficerSelect();
+            if (isAdmin) {
+                updateQuickRequestOfficerSelect();
+            }
+            
             document.getElementById('quickRequestModal').classList.add('active');
         }
 
@@ -480,7 +1649,7 @@
         async function submitQuickRequest() {
             const type = document.getElementById('quickRequestType').value;
             const notes = document.getElementById('quickRequestNotes').value.trim();
-            let targetUser = currentUserData.name || currentUser.email.split('@')[0];
+            let targetUser = currentUserData.name || currentUserData.email.split('@')[0];
             
             if (isAdmin) {
                 const selectedOfficer = document.getElementById('quickRequestOfficer').value;
@@ -502,7 +1671,7 @@
                 date: quickRequestDate,
                 status: 'pending',
                 notes: notes,
-                createdBy: currentUserData.name || currentUser.email,
+                createdBy: currentUserData.name || currentUserData.email,
                 createdAt: new Date().toISOString()
             };
 
@@ -516,59 +1685,7 @@
             }, 1000);
         }
 
-        // Helper functions
-        function getActiveOfficers() {
-            const today = new Date().toISOString().split('T')[0];
-            const absentOfficers = absences
-                .filter(a => a.status === 'approved' && a.startDate <= today && (!a.endDate || a.endDate >= today))
-                .map(a => a.user);
-            return officers.filter(o => !absentOfficers.includes(o));
-        }
-
-        function isOfficerAbsent(officer, dateStr) {
-            return absences.some(a => 
-                a.user === officer && 
-                a.status === 'approved' && 
-                a.startDate <= dateStr && 
-                (!a.endDate || a.endDate >= dateStr)
-            );
-        }
-
-        function checkHoliday(date) {
-            return ALL_SINGAPORE_HOLIDAYS.includes(date.toISOString().split('T')[0]);
-        }
-
-        function getHolidayName(date) {
-            return HOLIDAY_NAMES[date.toISOString().split('T')[0]] || null;
-        }
-
-        function checkAutoLock() {
-            const today = new Date();
-            if (today.getDate() >= 25) {
-                locked = true;
-                lockDate = new Date(today.getFullYear(), today.getMonth(), 25).toISOString();
-            }
-            if (locked) document.getElementById('lockAlert').classList.add('show');
-        }
-
-        function updateSyncStatus(status) {
-            const indicator = document.getElementById('syncIndicator');
-            const text = document.getElementById('syncText');
-            indicator.className = 'sync-indicator';
-            
-            if (status === 'synced') {
-                indicator.classList.add('sync-synced');
-                text.textContent = 'Synced';
-            } else if (status === 'pending') {
-                indicator.classList.add('sync-pending');
-                text.textContent = 'Syncing...';
-            } else if (status === 'error') {
-                indicator.classList.add('sync-error');
-                text.textContent = 'Sync Error';
-            }
-        }
-
-        // Render Functions (simplified versions - expand with your full logic)
+        // Render Functions
         function renderCalendar() {
             const grid = document.getElementById('calendarGrid');
             if (!grid) return;
@@ -580,65 +1697,214 @@
             document.getElementById('calendarMonthYear').textContent = 
                 `${monthNames[currentCalendarDate.getMonth()]} ${currentCalendarDate.getFullYear()}`;
             
-            // Calendar rendering logic (paste your existing renderCalendar code here)
-            // Make sure to use the Firebase data (roster, requests, absences)
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDay = new Date(year, month, 1).getDay();
+            
+            // Headers
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const header = document.createElement('div');
+                header.className = 'calendar-header';
+                header.textContent = day;
+                grid.appendChild(header);
+            });
+            
+            // Empty cells
+            for (let i = 0; i < firstDay; i++) {
+                grid.appendChild(document.createElement('div'));
+            }
+            
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            
+            // Days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const date = new Date(year, month, day);
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+                
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const isHoliday = checkHoliday(date);
+                const isToday = date.getTime() === today.getTime();
+                const isPast = date < today;
+                const holidayName = getHolidayName(date);
+                
+                if (isWeekend) dayDiv.classList.add('weekend');
+                if (isHoliday) dayDiv.classList.add('holiday');
+                if (isPast) dayDiv.classList.add('past');
+                
+                let html = `<div class="day-number">`;
+                if (isToday) {
+                    html += `<span class="today-marker">${day}</span>`;
+                } else {
+                    html += day;
+                }
+                
+                if (!isPast && (!locked || isAdmin)) {
+                    html += `<div class="day-actions">
+                        <button class="day-action-btn request" onclick="event.stopPropagation(); openQuickRequest('${dateStr}', 'call-request')" title="Request Call">✓</button>
+                        <button class="day-action-btn block" onclick="event.stopPropagation(); openQuickRequest('${dateStr}', 'call-block')" title="Block Day">🚫</button>
+                        <button class="day-action-btn leave" onclick="event.stopPropagation(); openQuickRequest('${dateStr}', 'leave')" title="Leave">🌴</button>
+                    </div>`;
+                }
+                html += `</div>`;
+                
+                if (holidayName) {
+                    html += `<div class="holiday-label">${holidayName}</div>`;
+                }
+                
+                const duty = roster[dateStr];
+                if (duty) {
+                    if (duty.onCall) html += `<div class="duty-assignment duty-oncall">📞 ${duty.onCall}</div>`;
+                    if (duty.postCall) html += `<div class="duty-assignment duty-postcall">😴 ${duty.postCall}</div>`;
+                    if (duty.wardRound && duty.wardRound.length > 0) {
+                        duty.wardRound.forEach(person => {
+                            html += `<div class="duty-assignment duty-ward">🏥 ${person}</div>`;
+                        });
+                    }
+                }
+                
+                const userName = currentUserData ? (currentUserData.name || currentUserData.email.split('@')[0]) : '';
+                const dayRequests = requests.filter(r => r.date === dateStr && r.user === userName);
+                if (dayRequests.length > 0) {
+                    html += `<div class="day-requests">`;
+                    dayRequests.forEach(r => {
+                        const icon = r.type === 'call-block' ? '🚫' : r.type === 'call-request' ? '✓' : '🌴';
+                        const status = r.status === 'approved' ? '✓' : r.status === 'rejected' ? '✗' : '⏳';
+                        html += `${icon}${status} `;
+                    });
+                    html += `</div>`;
+                }
+                
+                dayDiv.innerHTML = html;
+                dayDiv.onclick = () => openDayModal(dateStr);
+                grid.appendChild(dayDiv);
+            }
+        }
+
+        function openDayModal(dateStr) {
+            const modal = document.getElementById('dayModal');
+            const content = document.getElementById('modalContent');
+            const date = new Date(dateStr);
+            const holidayName = getHolidayName(date);
+            
+            document.getElementById('modalDate').textContent = new Date(dateStr).toDateString() + (holidayName ? ` - ${holidayName}` : '');
+            
+            let html = '';
+            const duty = roster[dateStr];
+            if (duty) {
+                html += `<div style="margin-bottom: 20px;"><h3>Current Assignments:</h3>
+                    <p><strong>On Call:</strong> ${duty.onCall || 'None'}</p>
+                    <p><strong>Post Call:</strong> ${duty.postCall || 'None'}</p>
+                    <p><strong>Ward Round:</strong> ${duty.wardRound ? duty.wardRound.join(', ') : 'None'}</p></div>`;
+            }
+            
+            const dayRequests = requests.filter(r => r.date === dateStr);
+            if (dayRequests.length > 0) {
+                html += `<div style="margin-bottom: 20px;"><h3>Requests for this date:</h3>`;
+                dayRequests.forEach(r => {
+                    html += `<div style="padding: 10px; background: #f8fafc; margin-bottom: 10px; border-radius: 8px;">
+                        <strong>${r.user}</strong>: ${r.type.replace('-', ' ')} 
+                        ${r.status === 'approved' ? '✓ Approved' : r.status === 'rejected' ? '✗ Rejected' : '⏳ Pending'}
+                        ${r.notes ? `<br><small style="color: #64748b;">${r.notes}</small>` : ''}
+                    </div>`;
+                });
+                html += `</div>`;
+            }
+            
+            const isPast = date < new Date().setHours(0,0,0,0);
+            if (!isPast && (!locked || isAdmin)) {
+                html += `<div style="margin-top: 20px;"><h3>Quick Actions:</h3>
+                    <button class="btn-small btn-success" onclick="quickRequestFromModal('${dateStr}', 'call-request')" style="margin: 5px;">Request Call Duty</button>
+                    <button class="btn-small btn-danger" onclick="quickRequestFromModal('${dateStr}', 'call-block')" style="margin: 5px;">Block This Day</button>
+                    <button class="btn-small" onclick="quickRequestFromModal('${dateStr}', 'leave')" style="margin: 5px;">Mark Leave</button>
+                </div>`;
+            }
+            
+            content.innerHTML = html;
+            modal.classList.add('active');
+        }
+
+        function quickRequestFromModal(date, type) {
+            closeModal();
+            openQuickRequest(date, type);
+        }
+
+        function closeModal() {
+            document.getElementById('dayModal').classList.remove('active');
         }
 
         function renderMyRequests() {
             const list = document.getElementById('myRequestsList');
-            if (!list) return;
+            if (!list || !currentUserData) return;
             
-            const userName = currentUserData.name || currentUser.email.split('@')[0];
+            const userName = currentUserData.name || currentUserData.email.split('@')[0];
             const myReqs = requests
                 .filter(r => r.user === userName)
                 .sort((a, b) => new Date(b.date) - new Date(a.date));
             
-            // Render logic (paste your existing code)
-        }
-
-        function renderMyAbsences() {
-            const list = document.getElementById('myAbsenceList');
-            if (!list) return;
+            if (myReqs.length === 0) {
+                list.innerHTML = `<div class="empty-state"><p>No requests found</p></div>`;
+                return;
+            }
             
-            const userName = currentUserData.name || currentUser.email.split('@')[0];
-            const myAbsences = absences
-                .filter(a => a.user === userName)
-                .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-            
-            // Render logic
+            list.innerHTML = myReqs.map(req => `
+                <div class="request-item ${req.type}">
+                    <div>
+                        <strong>${req.type.replace('-', ' ').toUpperCase()}</strong><br>
+                        <small>${new Date(req.date).toDateString()}</small>
+                        <span style="margin-left: 10px; font-size: 12px; color: ${req.status === 'approved' ? 'green' : req.status === 'rejected' ? 'red' : 'orange'}">${req.status}</span>
+                        ${req.notes ? `<br><small style="color: #64748b;">${req.notes}</small>` : ''}
+                    </div>
+                    <button class="btn-small btn-danger" onclick="deleteRequest(${req.id})" ${(locked && !isAdmin) ? 'disabled' : ''}>Delete</button>
+                </div>
+            `).join('');
         }
 
-        function renderStats() {
-            // Your stats calculation using Firebase data
-        }
-
-        function renderAdminPanel() {
-            if (!isAdmin) return;
-            // Your admin panel rendering
-        }
-
-        function renderUsersTable() {
-            if (!isAdmin) return;
-            // Fetch users from Firebase and render
-        }
-
-        function renderOfficersTab() {
-            if (!isAdmin) return;
-            // Your officers tab rendering
-        }
-
-        function updateOfficerSelects() {
-            if (!isAdmin) return;
-            // Update select dropdowns
-        }
-
-        // Request submission functions
         async function submitRequest() {
             if (locked && !isAdmin) {
                 showAlert('requestError', 'Requests are currently locked');
                 return;
             }
-            // Your existing submitRequest logic, but use await saveData() at the end
+            
+            const type = document.getElementById('requestType').value;
+            const date = document.getElementById('requestDate').value;
+            
+            if (!date) {
+                showAlert('requestError', 'Please select a date');
+                return;
+            }
+            if (new Date(date) < new Date().setHours(0,0,0,0)) {
+                showAlert('requestError', 'Cannot request for past dates');
+                return;
+            }
+            
+            const userName = currentUserData.name || currentUserData.email.split('@')[0];
+            const exists = requests.find(r => r.user === userName && r.date === date && r.type === type);
+            if (exists) {
+                showAlert('requestError', 'You already have this request for the selected date');
+                return;
+            }
+            
+            const request = {
+                id: Date.now(),
+                user: userName,
+                type: type,
+                date: date,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            requests.push(request);
+            await saveData();
+            
+            showAlert('requestSuccess', 'Request submitted successfully!');
+            document.getElementById('requestDate').value = '';
+            renderMyRequests();
+            renderCalendar();
         }
 
         async function deleteRequest(id) {
@@ -654,10 +1920,77 @@
             renderCalendar();
         }
 
-        // Absence functions
+        function renderMyAbsences() {
+            const list = document.getElementById('myAbsenceList');
+            if (!list || !currentUserData) return;
+            
+            const userName = currentUserData.name || currentUserData.email.split('@')[0];
+            const myAbsences = absences
+                .filter(a => a.user === userName)
+                .sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+            
+            if (myAbsences.length === 0) {
+                list.innerHTML = `<div class="empty-state"><p>No absence records found</p></div>`;
+                return;
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            
+            list.innerHTML = myAbsences.map(abs => {
+                const isActive = abs.startDate <= today && (!abs.endDate || abs.endDate >= today) && abs.status === 'approved';
+                return `
+                <div class="request-item absence" style="${isActive ? 'border-left-color: var(--danger); background: #fef2f2;' : ''}">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                            <strong>${abs.type.replace('-', ' ').toUpperCase()}</strong>
+                            <span class="status-badge ${abs.status === 'approved' ? 'status-active' : abs.status === 'rejected' ? 'status-inactive' : ''}">${abs.status}</span>
+                            ${isActive ? '<span style="color: var(--danger); font-size: 12px; font-weight: 700;">🔴 CURRENTLY ACTIVE</span>' : ''}
+                        </div>
+                        <small>From: ${new Date(abs.startDate).toDateString()}</small><br>
+                        ${abs.endDate ? `<small>Until: ${new Date(abs.endDate).toDateString()}</small><br>` : '<small>Duration: Indefinite</small><br>'}
+                        ${abs.reason ? `<small style="color: #64748b;">${abs.reason}</small>` : ''}
+                    </div>
+                    <button class="btn-small btn-danger" onclick="deleteAbsence(${abs.id})">Delete</button>
+                </div>
+            `}).join('');
+        }
+
         async function submitAbsence() {
-            // Your existing logic
-            // Use await saveData() at the end
+            const type = document.getElementById('absenceType').value;
+            const startDate = document.getElementById('absenceStartDate').value;
+            const endDate = document.getElementById('absenceEndDate').value;
+            const reason = document.getElementById('absenceReason').value.trim();
+            
+            if (!startDate) {
+                showAlert('absenceError', 'Please select a start date');
+                return;
+            }
+            if (endDate && endDate < startDate) {
+                showAlert('absenceError', 'End date cannot be before start date');
+                return;
+            }
+            
+            const userName = currentUserData.name || currentUserData.email.split('@')[0];
+            
+            const absence = {
+                id: Date.now(),
+                user: userName,
+                type: type,
+                startDate: startDate,
+                endDate: endDate || null,
+                reason: reason,
+                status: isAdmin ? 'approved' : 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            absences.push(absence);
+            await saveData();
+            
+            showAlert('absenceSuccess', isAdmin ? 'Absence recorded successfully!' : 'Absence notification submitted for approval!');
+            document.getElementById('absenceStartDate').value = '';
+            document.getElementById('absenceEndDate').value = '';
+            document.getElementById('absenceReason').value = '';
+            renderMyAbsences();
         }
 
         async function deleteAbsence(id) {
@@ -667,33 +2000,157 @@
             renderMyAbsences();
         }
 
-        // Admin functions
-        async function addNewUser() {
-            // Create user in Firebase Auth
+        function renderStats() {
+            const statsGrid = document.getElementById('statsGrid');
+            const detailedStats = document.getElementById('detailedStats');
+            if (!statsGrid || !detailedStats) return;
+            
+            const stats = {};
+            const activeOfficers = getActiveOfficers();
+            activeOfficers.forEach(officer => {
+                stats[officer] = { weekdayCall: 0, weekendCall: 0, wardRound: 0, total: 0 };
+            });
+            
+            Object.entries(roster).forEach(([date, duty]) => {
+                const d = new Date(date);
+                const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                const isHoliday = checkHoliday(d);
+                
+                if (duty.onCall && stats[duty.onCall]) {
+                    if (isWeekend || isHoliday) stats[duty.onCall].weekendCall++;
+                    else stats[duty.onCall].weekdayCall++;
+                    stats[duty.onCall].total++;
+                }
+                if (duty.wardRound) {
+                    duty.wardRound.forEach(person => {
+                        if (stats[person]) {
+                            stats[person].wardRound++;
+                            stats[person].total++;
+                        }
+                    });
+                }
+            });
+            
+            const totalDuties = Object.values(stats).reduce((sum, s) => sum + s.total, 0);
+            const avgDuties = activeOfficers.length > 0 ? totalDuties / activeOfficers.length : 0;
+            
+            statsGrid.innerHTML = `
+                <div class="stat-card"><h3>Active Officers</h3><div class="stat-value">${activeOfficers.length}</div></div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%);"><h3>Total Duties Assigned</h3><div class="stat-value">${totalDuties}</div></div>
+                <div class="stat-card" style="background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);"><h3>Avg Duties per Officer</h3><div class="stat-value">${avgDuties.toFixed(1)}</div></div>
+            `;
+            
+            if (activeOfficers.length === 0) {
+                detailedStats.innerHTML = '<p style="text-align: center; color: #64748b;">No active officers available for roster</p>';
+                return;
+            }
+            
+            detailedStats.innerHTML = `
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #f8fafc;">
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid #e2e8f0;">Officer</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0;">Weekday Call</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0;">Weekend/Hol Call</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0;">Ward Round</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid #e2e8f0;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(stats).map(([name, s]) => {
+                            const currentName = currentUserData ? (currentUserData.name || currentUserData.email.split('@')[0]) : '';
+                            return `
+                            <tr style="border-bottom: 1px solid #e2e8f0;">
+                                <td style="padding: 12px; font-weight: 600;">${name} ${name === currentName ? '(You)' : ''}</td>
+                                <td style="padding: 12px; text-align: center;">${s.weekdayCall}</td>
+                                <td style="padding: 12px; text-align: center;">${s.weekendCall}</td>
+                                <td style="padding: 12px; text-align: center;">${s.wardRound}</td>
+                                <td style="padding: 12px; text-align: center; font-weight: 700; color: var(--primary);">${s.total}</td>
+                            </tr>
+                        `}).join('')}
+                    </tbody>
+                </table>
+            `;
         }
 
-        async function toggleUserStatus(username) {
-            // Update user in Firebase
+        function getActiveOfficers() {
+            const today = new Date().toISOString().split('T')[0];
+            const absentOfficers = absences
+                .filter(a => a.status === 'approved' && a.startDate <= today && (!a.endDate || a.endDate >= today))
+                .map(a => a.user);
+            return officers.filter(o => !absentOfficers.includes(o));
         }
 
-        async function resetUserPassword(username) {
-            // Reset in Firebase Auth
-        }
-
-        async function addNewOfficer() {
-            // Add to Firebase users
-        }
-
-        async function removeOfficer() {
-            // Deactivate in Firebase
-        }
-
-        async function submitAdminRequest() {
-            // Create request and saveData()
-        }
-
-        async function submitAdminAbsence() {
-            // Create absence and saveData()
+        function renderAdminPanel() {
+            if (!isAdmin) return;
+            
+            // Update lock checkbox
+            document.getElementById('lockRequests').checked = locked;
+            
+            // Render officer lists
+            const activeOfficers = getActiveOfficers();
+            const inactiveOfficers = officers.filter(o => !activeOfficers.includes(o));
+            
+            document.getElementById('officerList').innerHTML = activeOfficers.length > 0 
+                ? activeOfficers.map(name => `<div class="member-tag">${name}</div>`).join('')
+                : '<span style="color: #64748b; font-size: 14px;">No active officers</span>';
+            
+            document.getElementById('inactiveOfficerList').innerHTML = inactiveOfficers.length > 0 
+                ? inactiveOfficers.map(name => `<div class="member-tag inactive">${name}</div>`).join('')
+                : '<span style="color: #64748b; font-size: 14px;">No inactive officers</span>';
+            
+            // Render all absences
+            const allAbs = absences.sort((a,b) => new Date(b.startDate) - new Date(a.startDate));
+            const absList = document.getElementById('allAbsencesList');
+            if (allAbs.length === 0) {
+                absList.innerHTML = '<p style="color: #64748b; text-align: center;">No absence records</p>';
+            } else {
+                const today = new Date().toISOString().split('T')[0];
+                absList.innerHTML = allAbs.map(abs => {
+                    const isActive = abs.startDate <= today && (!abs.endDate || abs.endDate >= today) && abs.status === 'approved';
+                    return `
+                    <div class="request-item absence" style="${isActive ? 'border-left-color: var(--danger);' : ''}">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 5px;">
+                                <strong>${abs.user}</strong>
+                                <span style="font-size: 12px; color: #64748b;">${abs.type.replace('-', ' ')}</span>
+                                ${isActive ? '<span style="color: var(--danger); font-size: 11px; font-weight: 700;">🔴 ACTIVE</span>' : ''}
+                            </div>
+                            <small>${new Date(abs.startDate).toDateString()} - ${abs.endDate ? new Date(abs.endDate).toDateString() : 'Indefinite'}</small><br>
+                            ${abs.reason ? `<small>${abs.reason}</small>` : ''}
+                        </div>
+                        <div>
+                            ${abs.status === 'pending' ? `
+                                <button class="btn-small btn-success" onclick="updateAbsenceStatus(${abs.id}, 'approved')">Approve</button>
+                                <button class="btn-small btn-danger" onclick="updateAbsenceStatus(${abs.id}, 'rejected')">Reject</button>
+                            ` : `<span class="status-badge ${abs.status === 'approved' ? 'status-active' : 'status-inactive'}">${abs.status}</span>`}
+                            <button class="btn-small" onclick="deleteAbsence(${abs.id})">Delete</button>
+                        </div>
+                    </div>
+                `}).join('');
+            }
+            
+            // Render all requests
+            const allReqs = requests.sort((a,b) => new Date(b.date) - new Date(a.date));
+            const list = document.getElementById('allRequestsList');
+            if (allReqs.length === 0) {
+                list.innerHTML = '<p style="color: #64748b; text-align: center;">No requests</p>';
+            } else {
+                list.innerHTML = allReqs.map(req => `
+                    <div class="request-item ${req.type}">
+                        <div>
+                            <strong>${req.user}</strong> - ${req.type.replace('-', ' ')}<br>
+                            <small>${new Date(req.date).toDateString()}</small>
+                            ${req.notes ? `<br><small>${req.notes}</small>` : ''}
+                        </div>
+                        <div>
+                            <button class="btn-small btn-success" onclick="updateRequestStatus(${req.id}, 'approved')">Approve</button>
+                            <button class="btn-small btn-danger" onclick="updateRequestStatus(${req.id}, 'rejected')">Reject</button>
+                            <button class="btn-small" onclick="deleteRequest(${req.id})">Delete</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
         }
 
         async function updateRequestStatus(id, status) {
@@ -731,54 +2188,164 @@
             location.reload();
         }
 
-        // Roster generation
         async function generateRoster() {
-            // Your existing algorithm
-            // Use await saveData() at the end instead of localStorage
+            const monthInput = document.getElementById('generateMonth').value;
+            if (!monthInput) {
+                showAlert('generateError', 'Please select a month');
+                return;
+            }
+            
+            const [year, month] = monthInput.split('-').map(Number);
+            const daysInMonth = new Date(year, month, 0).getDate();
+            
+            // Clear existing roster for this month
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                delete roster[dateStr];
+            }
+            
+            const activeOfficers = getActiveOfficers();
+            if (activeOfficers.length === 0) {
+                showAlert('generateError', 'No active officers available for roster generation');
+                return;
+            }
+            
+            // Build constraints
+            const constraints = {};
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                constraints[dateStr] = { blocked: [], requested: [], onLeave: [], justReturned: [] };
+                
+                requests.forEach(req => {
+                    if (req.date === dateStr && req.status !== 'rejected') {
+                        if (req.type === 'call-block') constraints[dateStr].blocked.push(req.user);
+                        if (req.type === 'call-request') constraints[dateStr].requested.push(req.user);
+                        if (req.type === 'leave') constraints[dateStr].onLeave.push(req.user);
+                    }
+                });
+                
+                activeOfficers.forEach(officer => {
+                    const isAbsent = absences.some(a => 
+                        a.user === officer && 
+                        a.status === 'approved' && 
+                        a.startDate <= dateStr && 
+                        (!a.endDate || a.endDate >= dateStr)
+                    );
+                    if (isAbsent && !constraints[dateStr].onLeave.includes(officer)) {
+                        constraints[dateStr].onLeave.push(officer);
+                    }
+                });
+            }
+            
+            // Initialize duty counts
+            const dutyCounts = {};
+            activeOfficers.forEach(o => dutyCounts[o] = { weekday: 0, weekend: 0, ward: 0, lastDuty: null });
+            
+            // Calculate existing duties from other months
+            Object.entries(roster).forEach(([date, duty]) => {
+                const d = new Date(date);
+                if (d.getMonth() + 1 !== month) {
+                    const isWeekend = d.getDay() === 0 || d.getDay() === 6;
+                    if (duty.onCall && dutyCounts[duty.onCall]) {
+                        if (isWeekend) dutyCounts[duty.onCall].weekend++;
+                        else dutyCounts[duty.onCall].weekday++;
+                    }
+                    if (duty.wardRound) {
+                        duty.wardRound.forEach(p => { if (dutyCounts[p]) dutyCounts[p].ward++; });
+                    }
+                }
+            });
+            
+            // Generate roster
+            let prevOnCall = null;
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const date = new Date(year, month - 1, day);
+                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                const isHoliday = checkHoliday(date);
+                const isSpecialDay = isWeekend || isHoliday;
+                const constraint = constraints[dateStr];
+                
+                let eligible = activeOfficers.filter(o => {
+                    if (constraint.onLeave.includes(o)) return false;
+                    if (constraint.blocked.includes(o)) return false;
+                    if (o === prevOnCall) return false;
+                    return true;
+                });
+                
+                let onCall = null;
+                if (constraint.requested.length > 0) {
+                    const requestedEligible = constraint.requested.filter(o => eligible.includes(o));
+                    if (requestedEligible.length > 0) {
+                        onCall = requestedEligible.sort((a,b) => {
+                            const totalA = dutyCounts[a].weekday + dutyCounts[a].weekend;
+                            const totalB = dutyCounts[b].weekday + dutyCounts[b].weekend;
+                            return totalA - totalB;
+                        })[0];
+                    }
+                }
+                
+                if (!onCall && eligible.length > 0) {
+                    onCall = eligible.sort((a,b) => {
+                        const totalA = dutyCounts[a].weekday + dutyCounts[a].weekend;
+                        const totalB = dutyCounts[b].weekday + dutyCounts[b].weekend;
+                        return totalA - totalB;
+                    })[0];
+                }
+                
+                if (onCall) {
+                    roster[dateStr] = roster[dateStr] || {};
+                    roster[dateStr].onCall = onCall;
+                    if (isSpecialDay) dutyCounts[onCall].weekend++;
+                    else dutyCounts[onCall].weekday++;
+                    prevOnCall = onCall;
+                }
+                
+                if (day > 1) {
+                    const prevDateStr = `${year}-${String(month).padStart(2, '0')}-${String(day-1).padStart(2, '0')}`;
+                    const prevDuty = roster[prevDateStr];
+                    if (prevDuty && prevDuty.onCall) {
+                        roster[dateStr] = roster[dateStr] || {};
+                        roster[dateStr].postCall = prevDuty.onCall;
+                    }
+                }
+                
+                if (isSpecialDay) {
+                    const postCall = roster[dateStr]?.postCall;
+                    let wardRound = [];
+                    if (postCall) wardRound.push(postCall);
+                    if (onCall && !wardRound.includes(onCall)) wardRound.push(onCall);
+                    
+                    if (wardRound.length < 2) {
+                        const wardEligible = activeOfficers.filter(o => {
+                            if (wardRound.includes(o)) return false;
+                            if (constraint.onLeave.includes(o)) return false;
+                            return true;
+                        });
+                        if (wardEligible.length > 0) {
+                            const second = wardEligible.sort((a,b) => dutyCounts[a].ward - dutyCounts[b].ward)[0];
+                            wardRound.push(second);
+                            dutyCounts[second].ward++;
+                        }
+                    }
+                    
+                    roster[dateStr] = roster[dateStr] || {};
+                    roster[dateStr].wardRound = wardRound;
+                }
+            }
+            
+            await saveData();
+            showAlert('generateSuccess', `Roster generated successfully for ${activeOfficers.length} active officers!`);
+            renderCalendar();
+            renderStats();
         }
 
-        // Settings functions
-        function showSettings() {
-            document.getElementById('settingsUsername').value = currentUserData.name || currentUser.email;
-            document.getElementById('settingsRole').value = isAdmin ? 'Administrator' : 'Medical Officer';
-            document.getElementById('settingsModal').classList.add('active');
-        }
-
-        function closeSettings() {
-            document.getElementById('settingsModal').classList.remove('active');
-        }
-
-        function checkSettingsPasswordStrength() {
-            // Your existing code
-        }
-
-        async function changePasswordFromSettings() {
-            // Your existing code using Firebase updatePassword
-        }
-
-        // Modal functions
-        function openDayModal(dateStr) {
-            // Your existing code
-        }
-
-        function quickRequestFromModal(date, type) {
-            closeModal();
-            openQuickRequest(date, type);
-        }
-
-        function closeModal() {
-            document.getElementById('dayModal').classList.remove('active');
-        }
-
-        // Make functions available globally for HTML onclick handlers
+        // Expose functions to window for HTML onclick handlers
         window.login = login;
         window.register = register;
         window.logout = logout;
         window.showRegister = showRegister;
         window.showLogin = showLogin;
-        window.changePassword = changePassword;
-        window.checkPasswordStrength = checkPasswordStrength;
-        window.checkRegPasswordStrength = checkRegPasswordStrength;
         window.showTab = showTab;
         window.changeMonth = changeMonth;
         window.jumpToMonth = jumpToMonth;
@@ -790,25 +2357,14 @@
         window.deleteRequest = deleteRequest;
         window.submitAbsence = submitAbsence;
         window.deleteAbsence = deleteAbsence;
-        window.showSettings = showSettings;
-        window.closeSettings = closeSettings;
-        window.changePasswordFromSettings = changePasswordFromSettings;
-        window.checkSettingsPasswordStrength = checkSettingsPasswordStrength;
-        window.openDayModal = openDayModal;
         window.closeModal = closeModal;
         window.quickRequestFromModal = quickRequestFromModal;
-        window.addNewUser = addNewUser;
-        window.toggleUserStatus = toggleUserStatus;
-        window.resetUserPassword = resetUserPassword;
-        window.addNewOfficer = addNewOfficer;
-        window.removeOfficer = removeOfficer;
-        window.submitAdminRequest = submitAdminRequest;
-        window.submitAdminAbsence = submitAdminAbsence;
         window.updateRequestStatus = updateRequestStatus;
         window.updateAbsenceStatus = updateAbsenceStatus;
         window.toggleLock = toggleLock;
         window.resetSystem = resetSystem;
         window.generateRoster = generateRoster;
+        window.checkRegPasswordStrength = checkRegPasswordStrength;
     </script>
 </body>
 </html>
